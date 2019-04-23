@@ -1,0 +1,13 @@
+service: budgetapp
+
+provider:
+  name: aws
+  runtime: nodejs8.10
+
+functions:
+  api:
+    handler: service.api
+    events:
+      - http:
+          path: /
+          method: post
