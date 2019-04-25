@@ -25,6 +25,13 @@ const ExpenseItemType = new GraphQLObjectType({
             total: { type: GraphQLInt },
             description: { type: GraphQLString },
             creationDate: { type: GraphQLString },
+            transactionsTotal: {
+                type: GraphQLInt,
+                async resolve(parent, args) {
+                    const expenseItem = await ExpenseItemModel.find(parent.id);
+                    return expenseItem.getTransactionsTotal();
+                }
+            },
             transactions: {
                 type: new GraphQLList(TransactionType),
                 resolve(parent, args) {
@@ -34,6 +41,8 @@ const ExpenseItemType = new GraphQLObjectType({
         };
     }
 });
+
+const expenseItemQueries = {};
 
 const expenseItemMutations = {
     addExpenseItem: {
@@ -91,5 +100,6 @@ const expenseItemMutations = {
 
 module.exports = {
     ExpenseItemType,
-    expenseItemMutations
+    expenseItemMutations,
+    expenseItemQueries
 };

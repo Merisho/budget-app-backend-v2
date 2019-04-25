@@ -25,6 +25,8 @@ const TransactionType = new GraphQLObjectType({
     }
 });
 
+const transactionQueries = {};
+
 const transactionMutations = {
     addTransaction: {
         type: TransactionType,
@@ -81,5 +83,6 @@ const transactionMutations = {
 
 module.exports = {
     TransactionType,
-    transactionMutations
+    transactionMutations,
+    transactionQueries
 };

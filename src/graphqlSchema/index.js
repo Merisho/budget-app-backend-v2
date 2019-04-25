@@ -5,14 +5,16 @@ const {
 
 const {userQueries, userMutations} = require('./UserSchema');
 const {budgetQueries, budgetMutations} = require('./BudgetSchema');
-const {expenseItemMutations} = require('./ExpenseItemSchema');
-const {transactionMutations} = require('./TransactionSchema');
+const {expenseItemQueries, expenseItemMutations} = require('./ExpenseItemSchema');
+const {transactionQueries, transactionMutations} = require('./TransactionSchema');
 
 const RootQueryType = new GraphQLObjectType({
     name: 'RootQuery',
     fields: {
         ...userQueries,
-        ...budgetQueries
+        ...budgetQueries,
+        ...expenseItemQueries,
+        ...transactionQueries
     }
 });
 

@@ -1,10 +1,12 @@
 const uuid = require('uuid');
 
 const BaseModel = require('./BaseModel');
+const transaction = require('./Transaction');
 
 module.exports = {
     init(storage) {
-        return class Budget extends BaseModel.init(storage) {
+        const Transaction = transaction.init(storage);
+        return class ExpenseItem extends BaseModel.init(storage) {
             constructor(data) {
                 super();
 
@@ -36,6 +38,11 @@ module.exports = {
                     creationDate: this.creationDate,
                     budgetID: this.budgetID
                 };
+            }
+
+            async getTransactionsTotal() {
+                const transactions = await Transaction.findByExpenseItemID(this.id);
+                return transactions.reduce((sum, t) => sum + t.total, 0);
             }
 
             get id() {
