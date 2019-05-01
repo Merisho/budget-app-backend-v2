@@ -32,6 +32,34 @@ const BudgetType = new GraphQLObjectType({
                 resolve(parent, args) {
                     return ExpenseItemModel.findByBudgetID(parent.id);
                 }
+            },
+            expenseItemsTotal: {
+                type: GraphQLInt,
+                async resolve(parent, args) {
+                    const budget = await BudgetModel.find(parent.id);
+                    return budget.getExpenseItemsTotal();
+                }
+            },
+            transactionsTotal: {
+                type: GraphQLInt,
+                async resolve(parent, args) {
+                    const budget = await BudgetModel.find(parent.id);
+                    return budget.getTransactionsTotal();
+                }
+            },
+            free: {
+                type: GraphQLInt,
+                async resolve(parent, args) {
+                    const budget = await BudgetModel.find(parent.id);
+                    return budget.free();
+                }
+            },
+            allowed: {
+                type: GraphQLInt,
+                async resolve(parent, args) {
+                    const budget = await BudgetModel.find(parent.id);
+                    return budget.allowed();
+                }
             }
         };
     }

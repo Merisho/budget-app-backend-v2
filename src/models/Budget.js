@@ -1,9 +1,11 @@
 const uuid = require('uuid');
 
 const BaseModel = require('./BaseModel');
+const expenseItem = require('./ExpenseItem');
 
 module.exports = {
     init(storage) {
+        const ExpenseItem = expenseItem.init(storage);
         return class Budget extends BaseModel.init(storage) {
             constructor(data) {
                 super();
@@ -40,6 +42,35 @@ module.exports = {
                     endDate: this.endDate,
                     userID: this.userID
                 };
+            }
+
+            async free() {
+                return this.total - (await this.getExpenseItemsTotal());
+            }
+
+            async allowed() {
+                return this.total - (await this.getTransactionsTotal());
+            }
+
+            async getExpenseItemsTotal() {
+                const items = await ExpenseItem.findByBudgetID(this.id);
+                return items.reduce((sum, i) => sum + i.total, 0);
+            }
+
+            async getTransactionsTotal() {
+                const items = await ExpenseItem.findByBudgetID(this.id);
+                const transactionsTotal = await Promise.all(items.map(i => i.getTransactionsTotal()));
+                return transactionsTotal.reduce((t1, t2) => t1 + t2);
+            }
+
+            async getTransactions() {
+                const items = await ExpenseItem.findByBudgetID(this.id);
+                const transactions = [];
+
+                const itemTransactions = await Promise.all(items.map(i => i.getTransactions()));
+                itemTransactions.forEach(t => transactions.push(...t));
+
+                return transactions;
             }
 
             get id() {

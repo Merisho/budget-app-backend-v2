@@ -3,6 +3,11 @@ const {
     GraphQLSchema,
 } = require('graphql');
 
+const appRegistry = require('../appRegistry');
+if (!appRegistry.get('models')) {
+    throw new Error('AppRegistry must contain models factory');
+}
+
 const {userQueries, userMutations} = require('./UserSchema');
 const {budgetQueries, budgetMutations} = require('./BudgetSchema');
 const {expenseItemQueries, expenseItemMutations} = require('./ExpenseItemSchema');

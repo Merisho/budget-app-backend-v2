@@ -41,8 +41,12 @@ module.exports = {
             }
 
             async getTransactionsTotal() {
-                const transactions = await Transaction.findByExpenseItemID(this.id);
+                const transactions = await this.getTransactions();
                 return transactions.reduce((sum, t) => sum + t.total, 0);
+            }
+
+            getTransactions() {
+                return Transaction.findByExpenseItemID(this.id);
             }
 
             get id() {
