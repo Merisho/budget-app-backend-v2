@@ -66,3 +66,52 @@ test('Must get all transactions', async t => {
 
     t.is(transactions.length, 3);
 });
+
+test('Must return allowed same as total if no expense items defined', async t => {
+    const stubStorage = {
+        getByCondition() {
+            return [];
+        }
+    };
+
+    const Budget = new ModelFactory(stubStorage).getModel('Budget');
+    const budget = new Budget({
+        total: 1000
+    });
+
+    t.is(await budget.allowed(), 1000);
+});
+
+test('Must return allowed same as total if no transactions commited', async t => {
+    const stubStorage = {
+        getByCondition(entityName) {
+            if (entityName === 'expenseItem') {
+                return [{ name: 'expense item', total: 100 }];
+            } else if (entityName === 'transaction') {
+                return [];
+            }
+        }
+    };
+
+    const Budget = new ModelFactory(stubStorage).getModel('Budget');
+    const budget = new Budget({
+        total: 1000
+    });
+
+    t.is(await budget.allowed(), 1000);
+});
+
+test('Must return free same as total if no expense items defined', async t => {
+    const stubStorage = {
+        getByCondition(entityName) {
+            return [];
+        }
+    };
+
+    const Budget = new ModelFactory(stubStorage).getModel('Budget');
+    const budget = new Budget({
+        total: 1000
+    });
+
+    t.is(await budget.free(), 1000);
+});

@@ -25,6 +25,7 @@ const ExpenseItemType = new GraphQLObjectType({
             total: { type: GraphQLInt },
             description: { type: GraphQLString },
             creationDate: { type: GraphQLString },
+            budgetID: { type: GraphQLID },
             transactionsTotal: {
                 type: GraphQLInt,
                 async resolve(parent, args) {
@@ -42,7 +43,17 @@ const ExpenseItemType = new GraphQLObjectType({
     }
 });
 
-const expenseItemQueries = {};
+const expenseItemQueries = {
+    expenseItem: {
+        type: ExpenseItemType,
+        args: {
+            id: { type: new GraphQLNonNull(GraphQLID) }
+        },
+        async resolve(parent, args) {
+            return ExpenseItemModel.find(args.id)
+        }
+    }
+};
 
 const expenseItemMutations = {
     addExpenseItem: {

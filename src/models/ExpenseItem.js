@@ -42,6 +42,10 @@ module.exports = {
 
             async getTransactionsTotal() {
                 const transactions = await this.getTransactions();
+                if (!transactions) {
+                    return 0;
+                }
+                
                 return transactions.reduce((sum, t) => sum + t.total, 0);
             }
 

@@ -54,11 +54,19 @@ module.exports = {
 
             async getExpenseItemsTotal() {
                 const items = await ExpenseItem.findByBudgetID(this.id);
+                if (!items) {
+                    return 0;
+                }
+                
                 return items.reduce((sum, i) => sum + i.total, 0);
             }
 
             async getTransactionsTotal() {
                 const items = await ExpenseItem.findByBudgetID(this.id);
+                if (!items) {
+                    return 0;
+                }
+
                 const transactionsTotal = await Promise.all(items.map(i => i.getTransactionsTotal()));
                 return transactionsTotal.reduce((t1, t2) => t1 + t2);
             }
