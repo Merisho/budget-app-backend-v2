@@ -5,7 +5,7 @@ const config = require('./config');
 const DynamoDB = require('./src/storages/DynamoDB');
 const storage = new DynamoDB({
     tables: config.dynamo.entityTables,
-    tableSuffix: config.dynamo.prodTableSuffix
+    tableSuffix: process.env.NODE_ENV === 'production' ? config.dynamo.prodTableSuffix : ''
 });
 
 const ModelFactory = require('./src/models');
