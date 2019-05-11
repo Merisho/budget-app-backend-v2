@@ -4,8 +4,14 @@ const dynamoUtils = require('./dynamoDBUtils');
 const Batcher = require('../lib/Batcher');
 
 module.exports = class DynamoDB {
-    constructor(params) {
-        this._awsDynamo = new AWS.DynamoDB(params);
+    constructor(params = {}) {
+        if (!params.tables) {
+            throw new Error('Entity tables must be defined');
+        }
+
+        this._awsDynamo = new AWS.DynamoDB(params.dynamo);
+        this._tableSuffix = params.tableSuffix || '';
+        this._tables = params.tables;
     }
 
     getByID(entityName, id) {
@@ -93,16 +99,11 @@ module.exports = class DynamoDB {
     }
 
     _resolveTable(entity) {
-        if (entity === 'user') {
-            return 'BudgetApp-Users';
-        } else if (entity === 'budget') {
-            return 'BudgetApp-Budgets';
-        } else if (entity === 'expenseItem') {
-            return 'BudgetApp-ExpenseItems';
-        } else if (entity === 'transaction') {
-            return 'BudgetApp-Transactions';
+        let tableName = this._tables[entity];
+        if (!tableName) {
+            throw new Error(`Invalid entity name ${entity}: no table for the given entity`);
         }
 
-        throw new Error(`Invalid entity name ${entity}: no table for the given entity`);
+        return tableName + this._tableSuffix;
     }
 };

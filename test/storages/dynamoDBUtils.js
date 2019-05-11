@@ -75,3 +75,19 @@ test('Must build FilterExpression', t => {
 
     t.is(filterExpression, 'attr1 = :attr1, attr2 = :attr2');
 });
+
+test('Must build DeleteRequest for BatchWriteItem', t => {
+    const id = 'test';
+
+    const deleteReq = dynamoUtils.deleteRequest(id);
+
+    t.deepEqual(deleteReq, {
+        DeleteRequest: {
+            Key: {
+                id: {
+                    S: 'test'
+                }
+            }
+        }
+    });
+});

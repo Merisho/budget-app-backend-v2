@@ -1,7 +1,12 @@
 const {graphql} = require('graphql');
 
+const config = require('./config');
+
 const DynamoDB = require('./src/storages/DynamoDB');
-const storage = new DynamoDB();
+const storage = new DynamoDB({
+    tables: config.dynamo.entityTables,
+    tableSuffix: config.dynamo.prodTableSuffix
+});
 
 const ModelFactory = require('./src/models');
 const modelFactory = new ModelFactory(storage);
