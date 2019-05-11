@@ -1,6 +1,7 @@
 const AWS = require('aws-sdk');
 
 const dynamoUtils = require('./dynamoDBUtils');
+const Batcher = require('../lib/Batcher');
 
 module.exports = class DynamoDB {
     constructor(params) {
@@ -40,6 +41,24 @@ module.exports = class DynamoDB {
             },
             TableName: table
         }).promise();
+    }
+
+    async deleteByCondition(entityName, condition) {
+        const table = this._resolveTable(entityName);
+
+        const maxAWSBatchSize = 25;
+        const batcher = new Batcher(maxAWSBatchSize);
+        const items = await this.getByCondition(entityName, condition);
+        const itemIds = items.map(i => i.id);
+        itemIds.forEach(id => batcher.push(dynamoUtils.deleteRequest(id)));
+
+        return Promise.all(batcher.all().map(b => {
+            return this._awsDynamo.batchWriteItem({
+                RequestItems: {
+                    [table]: b
+                }
+            }).promise();
+        })).then(() => itemIds);
     }
 
     updateByID(entityName, id, data) {

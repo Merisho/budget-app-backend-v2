@@ -29,6 +29,25 @@ module.exports = {
                 });
             }
 
+            static async delete(id) {
+                await Transaction.deleteWhere({ expenseItemID: id });
+                await super.delete(id);
+            }
+
+            static async deleteWhere(condition) {
+                const expenseItems = await this.findWhere(condition);
+
+                if (!expenseItems) {
+                    return [];
+                }
+                
+                await Promise.all(expenseItems.map(expItem => {
+                    return Transaction.deleteWhere({ expenseItemID: expItem.id });
+                }));
+
+                return super.deleteWhere(condition);
+            }
+
             toJSON() {
                 return {
                     id: this.id,

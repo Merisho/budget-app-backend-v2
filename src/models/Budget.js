@@ -31,6 +31,11 @@ module.exports = {
                 });
             }
 
+            static async delete(id) {
+                await ExpenseItem.deleteWhere({ budgetID: id });
+                await super.delete(id);
+            }
+
             toJSON() {
                 return {
                     id: this.id,

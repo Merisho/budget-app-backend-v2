@@ -1,9 +1,10 @@
 const test = require('ava');
+const sinon = require('sinon');
 
 const ModelFactory = require('../../src/models');
 
 test('Must return expense items total', async t => {
-    const stubStorage = {
+    const storage = {
         getByCondition() {
             return [
                 { name: 'expense item 1', total: 30 },
@@ -13,14 +14,14 @@ test('Must return expense items total', async t => {
         }
     };
     
-    const Budget = new ModelFactory(stubStorage).getModel('Budget');
+    const Budget = new ModelFactory(storage).getModel('Budget');
     const budget = new Budget({});
 
     t.is(await budget.getExpenseItemsTotal(), 100);
 });
 
 test('Must return transactions total', async t => {
-    const stubStorage = {
+    const storage = {
         getByCondition(entityName) {
             if (entityName === 'expenseItem') {
                 return [
@@ -36,14 +37,14 @@ test('Must return transactions total', async t => {
         }
     };
     
-    const Budget = new ModelFactory(stubStorage).getModel('Budget');
+    const Budget = new ModelFactory(storage).getModel('Budget');
     const budget = new Budget({});
 
     t.is(await budget.getTransactionsTotal(), 60);
 });
 
 test('Must get all transactions', async t => {
-    const stubStorage = {
+    const storage = {
         getByCondition(entityName) {
             if (entityName === 'expenseItem') {
                 return [
@@ -59,7 +60,7 @@ test('Must get all transactions', async t => {
         }
     };
 
-    const Budget = new ModelFactory(stubStorage).getModel('Budget');
+    const Budget = new ModelFactory(storage).getModel('Budget');
     const budget = new Budget({});
 
     const transactions = await budget.getTransactions();
@@ -68,13 +69,13 @@ test('Must get all transactions', async t => {
 });
 
 test('Must return allowed same as total if no expense items defined', async t => {
-    const stubStorage = {
+    const storage = {
         getByCondition() {
             return [];
         }
     };
 
-    const Budget = new ModelFactory(stubStorage).getModel('Budget');
+    const Budget = new ModelFactory(storage).getModel('Budget');
     const budget = new Budget({
         total: 1000
     });
@@ -83,7 +84,7 @@ test('Must return allowed same as total if no expense items defined', async t =>
 });
 
 test('Must return allowed same as total if no transactions commited', async t => {
-    const stubStorage = {
+    const storage = {
         getByCondition(entityName) {
             if (entityName === 'expenseItem') {
                 return [{ name: 'expense item', total: 100 }];
@@ -93,7 +94,7 @@ test('Must return allowed same as total if no transactions commited', async t =>
         }
     };
 
-    const Budget = new ModelFactory(stubStorage).getModel('Budget');
+    const Budget = new ModelFactory(storage).getModel('Budget');
     const budget = new Budget({
         total: 1000
     });
@@ -102,16 +103,49 @@ test('Must return allowed same as total if no transactions commited', async t =>
 });
 
 test('Must return free same as total if no expense items defined', async t => {
-    const stubStorage = {
-        getByCondition(entityName) {
+    const storage = {
+        getByCondition() {
             return [];
         }
     };
 
-    const Budget = new ModelFactory(stubStorage).getModel('Budget');
+    const Budget = new ModelFactory(storage).getModel('Budget');
     const budget = new Budget({
         total: 1000
     });
 
     t.is(await budget.free(), 1000);
+});
+
+test('Must delete child expense item when the budget is deleted', async t => {
+    const storage = {
+        deleteByCondition: sinon.spy(),
+        deleteByID() {},
+        getByCondition() {
+            return [{ id: 'expense-item' }];
+        }
+    };
+
+    const Budget = new ModelFactory(storage).getModel('Budget');
+    await Budget.delete('id');
+
+    t.true(storage.deleteByCondition.called);
+    t.true(storage.deleteByCondition.calledWith('expenseItem'));
+});
+
+test('Must delete child expense items before the actual budget', async t => {
+    const storage = {
+        deleteByCondition: sinon.spy(),
+        deleteByID: sinon.spy(),
+        getByCondition() {
+            return [{ id: 'expense-item' }];
+        }
+    };
+
+    const Budget = new ModelFactory(storage).getModel('Budget');
+    await Budget.delete('id');
+
+    t.true(storage.deleteByCondition.calledWith('expenseItem'));
+    t.true(storage.deleteByCondition.calledBefore(storage.deleteByID));
+    t.true(storage.deleteByID.firstCall.calledWith('budget'));
 });

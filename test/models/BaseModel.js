@@ -155,3 +155,17 @@ test('Must set only defined properties which exist in the model and are not func
     t.is(model.nonExisting, undefined);
     t.not(model.update, 'test');
 });
+
+test('Must delete entities by condition', async t => {
+    let modelEntity;
+    let deleteByConditionCalled = false;
+    stubStorage.deleteByCondition = (entity) => {
+        modelEntity = entity;
+        deleteByConditionCalled = true;
+    };
+
+    await TestBaseModel.deleteWhere({ expenseItemID: 'id' });
+
+    t.true(deleteByConditionCalled);
+    t.is(modelEntity, TestBaseModel.entityName);
+});

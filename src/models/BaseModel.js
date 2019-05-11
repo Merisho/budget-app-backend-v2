@@ -15,6 +15,10 @@ module.exports = {
                 await storage.deleteByID(this.entityName, id);
             }
 
+            static deleteWhere(condition) {
+                return storage.deleteByCondition(this.entityName, condition);
+            }
+
             static async save(data) {
                 const model = this.create(data);
                 await storage.save(this.entityName, model.toJSON());

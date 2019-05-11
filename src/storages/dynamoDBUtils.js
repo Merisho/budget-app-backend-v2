@@ -74,6 +74,18 @@ module.exports = {
         return entity;
     },
 
+    deleteRequest(id) {
+        const idVal = this.dynamoValue(id);
+
+        return {
+            DeleteRequest: {
+                Key: {
+                    id: { ...idVal }
+                }
+            }
+        };
+    },
+
     dynamoValue(val) {
         if (val === null) {
             return {
