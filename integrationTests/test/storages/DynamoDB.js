@@ -2,8 +2,8 @@ const test = require('ava');
 const AWS = require('aws-sdk');
 const uuid = require('uuid');
 
+const config = require('../../config');
 const DynamoDBTestHelper = require('../../testLibs/DynamoDBTestHelper');
-
 const DynamoDBStorage = require('../../../src/storages/DynamoDB');
 
 if (!process.env.KEY || !process.env.SECRET || !process.env.REGION) {
@@ -16,8 +16,8 @@ const dynamoHelper = new DynamoDBTestHelper(new AWS.DynamoDB({
     region: process.env.REGION
 }));
 
-const testEntity = 'test';
-const testTable = 'BudgetApp-Test';
+const { testEntity } = config;
+const testTable = config.tables[testEntity];
 
 const customDynamo = new DynamoDBStorage({
     dynamo: {
@@ -25,9 +25,7 @@ const customDynamo = new DynamoDBStorage({
         secretAccessKey: process.env.SECRET,
         region: process.env.REGION
     },
-    tables: {
-        [testEntity]: testTable
-    }
+    tables: config.tables
 });
 
 test.after(async () => {
