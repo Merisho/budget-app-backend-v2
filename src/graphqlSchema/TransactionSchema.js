@@ -2,11 +2,11 @@ const {
     GraphQLObjectType,
     GraphQLString,
     GraphQLID,
-    GraphQLInt,
     GraphQLNonNull
 } = require('graphql');
 
 const appRegistry = require('../appRegistry');
+const LongType = require('./LongType');
 
 const modelsFactory = appRegistry.get('models');
 
@@ -18,7 +18,7 @@ const TransactionType = new GraphQLObjectType({
         return {
             id: { type: GraphQLID },
             name: { type: GraphQLString },
-            total: { type: GraphQLInt },
+            total: { type: LongType },
             description: { type: GraphQLString },
             creationDate: { type: GraphQLString }
         };
@@ -32,7 +32,7 @@ const transactionMutations = {
         type: TransactionType,
         args: {
             name: { type: new GraphQLNonNull(GraphQLString) },
-            total: { type: GraphQLInt },
+            total: { type: LongType },
             description: { type: GraphQLString },
             expenseItemID: { type: new GraphQLNonNull(GraphQLID) }
         },
@@ -52,7 +52,7 @@ const transactionMutations = {
         args: {
             id: { type: new GraphQLNonNull(GraphQLID) },
             name: { type: GraphQLString },
-            total: { type: GraphQLInt },
+            total: { type: LongType },
             description: { type: GraphQLString }
         },
         async resolve(parent, args) {

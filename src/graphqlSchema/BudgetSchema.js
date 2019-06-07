@@ -2,12 +2,12 @@ const {
     GraphQLObjectType,
     GraphQLString,
     GraphQLID,
-    GraphQLInt,
     GraphQLNonNull,
     GraphQLList
 } = require('graphql');
 
 const {ExpenseItemType} = require('./ExpenseItemSchema');
+const LongType = require('./LongType');
 
 const appRegistry = require('../appRegistry');
 
@@ -22,7 +22,7 @@ const BudgetType = new GraphQLObjectType({
         return {
             id: { type: GraphQLID },
             name: { type: GraphQLString },
-            total: { type: GraphQLInt },
+            total: { type: LongType },
             description: { type: GraphQLString },
             creationDate: { type: GraphQLString },
             startDate: { type: GraphQLString },
@@ -34,28 +34,28 @@ const BudgetType = new GraphQLObjectType({
                 }
             },
             expenseItemsTotal: {
-                type: GraphQLInt,
+                type: LongType,
                 async resolve(parent, args) {
                     const budget = await BudgetModel.find(parent.id);
                     return budget.getExpenseItemsTotal();
                 }
             },
             transactionsTotal: {
-                type: GraphQLInt,
+                type: LongType,
                 async resolve(parent, args) {
                     const budget = await BudgetModel.find(parent.id);
                     return budget.getTransactionsTotal();
                 }
             },
             free: {
-                type: GraphQLInt,
+                type: LongType,
                 async resolve(parent, args) {
                     const budget = await BudgetModel.find(parent.id);
                     return budget.free();
                 }
             },
             allowed: {
-                type: GraphQLInt,
+                type: LongType,
                 async resolve(parent, args) {
                     const budget = await BudgetModel.find(parent.id);
                     return budget.allowed();
@@ -82,7 +82,7 @@ const budgetMutations = {
         type: BudgetType,
         args: {
             name: { type: new GraphQLNonNull(GraphQLString) },
-            total: { type: GraphQLInt },
+            total: { type: LongType },
             description: { type: GraphQLString },
             startDate: { type: new GraphQLNonNull(GraphQLString) },
             endDate: { type: new GraphQLNonNull(GraphQLString) },
@@ -106,7 +106,7 @@ const budgetMutations = {
         args: {
             id: { type: new GraphQLNonNull(GraphQLID) },
             name: { type: GraphQLString },
-            total: { type: GraphQLInt },
+            total: { type: LongType },
             description: { type: GraphQLString },
             startDate: { type: GraphQLString },
             endDate: { type: GraphQLString }

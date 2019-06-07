@@ -2,12 +2,12 @@ const {
     GraphQLObjectType,
     GraphQLString,
     GraphQLID,
-    GraphQLInt,
     GraphQLNonNull,
     GraphQLList
 } = require('graphql');
 
 const {TransactionType} = require('./TransactionSchema');
+const LongType = require('./LongType');
 
 const appRegistry = require('../appRegistry');
 
@@ -22,12 +22,12 @@ const ExpenseItemType = new GraphQLObjectType({
         return {
             id: { type: GraphQLID },
             name: { type: GraphQLString },
-            total: { type: GraphQLInt },
+            total: { type: LongType },
             description: { type: GraphQLString },
             creationDate: { type: GraphQLString },
             budgetID: { type: GraphQLID },
             transactionsTotal: {
-                type: GraphQLInt,
+                type: LongType,
                 async resolve(parent, args) {
                     const expenseItem = await ExpenseItemModel.find(parent.id);
                     return expenseItem.getTransactionsTotal();
@@ -60,7 +60,7 @@ const expenseItemMutations = {
         type: ExpenseItemType,
         args: {
             name: { type: new GraphQLNonNull(GraphQLString) },
-            total: { type: GraphQLInt },
+            total: { type: LongType },
             description: { type: GraphQLString },
             budgetID: { type: new GraphQLNonNull(GraphQLID) }
         },
@@ -80,7 +80,7 @@ const expenseItemMutations = {
         args: {
             id: { type: new GraphQLNonNull(GraphQLID) },
             name: { type: GraphQLString },
-            total: { type: GraphQLInt },
+            total: { type: LongType },
             description: { type: GraphQLString }
         },
         async resolve(parent, args) {
