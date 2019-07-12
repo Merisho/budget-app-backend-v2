@@ -1,7 +1,15 @@
 service: budgetapp
 
+custom:
+  stage: ${opt:stage, self:provider.stage}
+  env:
+    STAGE:
+      prod: "production"
+      dev: "development"
+
 provider:
   name: aws
+  stage: dev
   runtime: nodejs8.10
 
 functions:
@@ -11,3 +19,5 @@ functions:
       - http:
           path: /
           method: post
+    environment:
+      NODE_ENV: ${self:custom.env.STAGE.${self:custom.stage}}
