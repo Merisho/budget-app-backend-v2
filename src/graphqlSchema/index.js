@@ -8,6 +8,10 @@ if (!appRegistry.get('models')) {
     throw new Error('AppRegistry must contain models factory');
 }
 
+if (!appRegistry.get('auth')) {
+    throw new Error('AppRegistry must contain auth service');
+}
+
 const {userQueries, userMutations} = require('./UserSchema');
 const {budgetQueries, budgetMutations} = require('./BudgetSchema');
 const {expenseItemQueries, expenseItemMutations} = require('./ExpenseItemSchema');

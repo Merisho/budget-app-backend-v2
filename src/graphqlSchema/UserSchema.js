@@ -9,6 +9,7 @@ const {
 const appRegistry = require('../appRegistry');
 
 const modelsFactory = appRegistry.get('models');
+const auth = appRegistry.get('auth');
 
 const UserModel = modelsFactory.getModel('User');
 const BudgetModel = modelsFactory.getModel('Budget');
@@ -22,7 +23,6 @@ const UserType = new GraphQLObjectType({
             id: { type: GraphQLID },
             login: { type: GraphQLString },
             email: { type: GraphQLString },
-            password: { type: GraphQLString },
             budgets: {
                 type: new GraphQLList(BudgetType),
                 resolve(parent, args) {
@@ -46,18 +46,47 @@ const userQueries = {
 };
 
 const userMutations = {
+    authUser: {
+        type: UserType,
+        args: {
+            accessToken: { type: new GraphQLNonNull(GraphQLString) }
+        },
+        async resolve(parent, args) {
+            let authData;
+            try {
+                authData = await auth.getUser(args.accessToken);
+            } catch(err) {
+                console.log(err);
+                return null;
+            }
+
+            if (!authData.id) {
+                throw new ReferenceError('User has no ID');
+            }
+
+            const user = await UserModel.find(authData.id);
+            if (!user) {
+                return await UserModel.save({
+                    id: authData.id,
+                    login: authData.username,
+                    email: authData.email
+                });
+            }
+
+            return user;
+        }
+    },
+
     addUser: {
         type: UserType,
         args: {
             login: { type: new GraphQLNonNull(GraphQLString) },
-            email: { type: GraphQLString },
-            password: { type: new GraphQLNonNull(GraphQLString) }
+            email: { type: GraphQLString }
         },
         resolve(parent, args) {
             return UserModel.save({
                 login: args.login,
-                email: args.email,
-                password: args.password
+                email: args.email
             });
         }
     },

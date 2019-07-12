@@ -11,8 +11,12 @@ const storage = new DynamoDB({
 const ModelFactory = require('./src/models');
 const modelFactory = new ModelFactory(storage);
 
+const Cognito = require('./src/auth/Cognito');
+const auth = new Cognito();
+
 const appRegistry = require('./src/appRegistry');
 appRegistry.set('models', modelFactory);
+appRegistry.set('auth', auth);
 
 const graphqlSchema = require('./src/graphqlSchema');
 
@@ -27,7 +31,7 @@ module.exports.api = async (event, context) => {
             body: JSON.stringify(result),
         };
     } catch(err) {
-        console.log(err);
+        console.error(err);
         return {
             statusCode: 500,
             body: 'Internal error',
