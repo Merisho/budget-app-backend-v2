@@ -18,6 +18,7 @@ module.exports = {
                 this._startDate = data.startDate;
                 this._endDate = data.endDate;
                 this._userID = data.userID;
+                this._collaborators = data.collaborators;
             }
 
             static async findByUserID(userID) {
@@ -45,7 +46,8 @@ module.exports = {
                     creationDate: this.creationDate,
                     startDate: this.startDate,
                     endDate: this.endDate,
-                    userID: this.userID
+                    userID: this.userID,
+                    collaborators: this.collaborators
                 };
             }
 
@@ -86,6 +88,12 @@ module.exports = {
                 return transactions;
             }
 
+            async shareWith(userID) {
+                await this.sync();
+                this._collaborators.push(userID);
+                await this.update();
+            }
+
             get id() {
                 return this._id;
             }
@@ -116,6 +124,10 @@ module.exports = {
 
             get userID() {
                 return this._userID;
+            }
+
+            get collaborators() {
+                return this._collaborators;
             }
 
             set name(val) {

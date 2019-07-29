@@ -14,6 +14,7 @@ test.beforeEach(() => {
     TestBaseModel = class extends BaseModel {
         constructor(data) {
             super();
+            this._id = data.id;
             this._name = data.name;
             this._testField = data.testField;
         }
@@ -167,5 +168,21 @@ test('Must delete entities by condition', async t => {
     await TestBaseModel.deleteWhere({ expenseItemID: 'id' });
 
     t.true(deleteByConditionCalled);
+    t.is(modelEntity, TestBaseModel.entityName);
+});
+
+test('Must sync the entity by its ID with remote data source', async t => {
+    let modelEntity;
+    stubStorage.getByID = (entity) => {
+        modelEntity = entity;
+        return {
+            name: 'synchronized'
+        };
+    };
+    const entity = new TestBaseModel({ id: 'test' });
+
+    await entity.sync();
+
+    t.is(entity.name, 'synchronized');
     t.is(modelEntity, TestBaseModel.entityName);
 });

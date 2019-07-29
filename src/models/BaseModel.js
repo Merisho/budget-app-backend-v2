@@ -47,6 +47,19 @@ module.exports = {
                 return this;
             }
 
+            async sync() {
+                const fresh = await this.constructor.find(this.id);
+                if (!fresh) {
+                    return;
+                }
+
+                for (const p in fresh) {
+                    if (p.startsWith('_') && typeof this[p] !== 'function') {
+                        this[p] = fresh[p];
+                    }
+                }
+            }
+
             static get entityName() {
                 throw new TypeError('entityName must be defined in a child class');
             }
