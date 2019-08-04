@@ -101,6 +101,8 @@ module.exports = {
         if (type === 'object') {
             if (val instanceof Date) {
                 return { S: val.toISOString() };
+            } else if (val instanceof Array) {
+                return { SS: val };
             }
 
             return { S: JSON.stringify(val) };

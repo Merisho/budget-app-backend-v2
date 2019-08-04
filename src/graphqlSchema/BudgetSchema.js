@@ -134,6 +134,22 @@ const budgetMutations = {
         resolve(parent, args) {
             return BudgetModel.delete(args.id);
         }
+    },
+
+    shareBudget: {
+        type: BudgetType,
+        args: {
+            id: { type: new GraphQLNonNull(GraphQLID) },
+            userID: { type: new GraphQLNonNull(GraphQLID) }
+        },
+        async resolve(parent, args) {
+            const budget = await BudgetModel.find(args.id);
+            if (!budget) {
+                return null;
+            }
+
+            return budget.shareWith(args.userID);
+        }
     }
 };
 

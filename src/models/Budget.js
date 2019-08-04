@@ -18,7 +18,7 @@ module.exports = {
                 this._startDate = data.startDate;
                 this._endDate = data.endDate;
                 this._userID = data.userID;
-                this._collaborators = data.collaborators;
+                this._collaborators = data.collaborators || [];
             }
 
             static async findByUserID(userID) {
@@ -92,6 +92,8 @@ module.exports = {
                 await this.sync();
                 this._collaborators.push(userID);
                 await this.update();
+
+                return this;
             }
 
             get id() {
