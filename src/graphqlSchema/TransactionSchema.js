@@ -34,14 +34,15 @@ const transactionMutations = {
             name: { type: new GraphQLNonNull(GraphQLString) },
             total: { type: LongType },
             description: { type: GraphQLString },
-            expenseItemID: { type: new GraphQLNonNull(GraphQLID) }
+            expenseItemID: { type: new GraphQLNonNull(GraphQLID) },
+            creationDate: { type: GraphQLString }
         },
         resolve(parent, args) {
             return TransactionModel.save({
                 name: args.name,
                 total: args.total || 0,
                 description: args.description,
-                creationDate: new Date().toISOString(),
+                creationDate: args.creationDate || new Date().toISOString(),
                 expenseItemID: args.expenseItemID
             });
         }
@@ -53,7 +54,8 @@ const transactionMutations = {
             id: { type: new GraphQLNonNull(GraphQLID) },
             name: { type: GraphQLString },
             total: { type: LongType },
-            description: { type: GraphQLString }
+            description: { type: GraphQLString },
+            creationDate: { type: GraphQLString }
         },
         async resolve(parent, args) {
             const transaction = await TransactionModel.find(args.id);
