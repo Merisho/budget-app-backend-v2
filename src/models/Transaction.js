@@ -4,7 +4,7 @@ const BaseModel = require('./BaseModel');
 
 module.exports = {
     init(storage) {
-        return class Budget extends BaseModel.init(storage) {
+        return class Transaction extends BaseModel.init(storage) {
             constructor(data) {
                 super();
 
@@ -68,6 +68,10 @@ module.exports = {
 
             get creationDate() {
                 return this._creationDate;
+            }
+
+            set creationDate(val) {
+                this._creationDate = val;
             }
 
             get expenseItemID() {
