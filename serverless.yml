@@ -10,7 +10,7 @@ custom:
 provider:
   name: aws
   stage: dev
-  runtime: nodejs8.10
+  runtime: nodejs12.x
 
 functions:
   api:

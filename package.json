@@ -4,7 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "npx ava --verbose"
+    "test": "npx ava --verbose",
+    "deploy": "serverless deploy -s dev",
+    "deploy-prod": "serverless deploy -s prod"
   },
   "keywords": [],
   "author": "",
