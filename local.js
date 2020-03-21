@@ -30,25 +30,6 @@ appRegistry.set('auth', auth);
 
 const graphqlSchema = require('./src/graphqlSchema');
 
-module.exports.api = async (event, context) => {
-    try {
-        const result = await graphql(graphqlSchema, event.body);
-        return {
-            statusCode: 200,
-            headers: {
-                'Access-Control-Allow-Origin' : '*'
-            },
-            body: JSON.stringify(result),
-        };
-    } catch(err) {
-        console.error(err);
-        return {
-            statusCode: 500,
-            body: 'Internal error',
-        };
-    }
-};
-
 const server = http.createServer((req, res) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Content-Type', 'application/json');
@@ -95,7 +76,7 @@ async function handleRequest(body) {
     }
 }
 
-const port = 3000;
+const port = 3001;
 server.listen(port, 'localhost', err => {
     if (err) {
         console.error(err);

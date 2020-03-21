@@ -25,8 +25,13 @@ const UserType = new GraphQLObjectType({
             email: { type: GraphQLString },
             budgets: {
                 type: new GraphQLList(BudgetType),
-                resolve(parent, args) {
-                    return BudgetModel.findByUserID(parent.id);
+                async resolve(parent, args) {
+                    const [own, shared] = await Promise.all([
+                        BudgetModel.findByUserID(parent.id),
+                        BudgetModel.findWhere({ collaborators: { contains: parent.id } })
+                    ]);
+
+                    return own.concat(shared);
                 }
             }
         };

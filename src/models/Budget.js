@@ -38,7 +38,7 @@ module.exports = {
             }
 
             toJSON() {
-                return {
+                const json = {
                     id: this.id,
                     name: this.name,
                     total: this.total,
@@ -47,8 +47,13 @@ module.exports = {
                     startDate: this.startDate,
                     endDate: this.endDate,
                     userID: this.userID,
-                    collaborators: this.collaborators
                 };
+
+                if (this.collaborators.length > 0) {
+                    json.collaborators = this.collaborators;
+                }
+
+                return json;
             }
 
             async free() {
@@ -89,6 +94,10 @@ module.exports = {
             }
 
             async shareWith(userID) {
+                if (this.userID === userID || this.collaborators.includes(userID)) {
+                    return this;
+                }
+
                 await this.sync();
                 this._collaborators.push(userID);
                 await this.update();
