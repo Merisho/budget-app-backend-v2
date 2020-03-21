@@ -6,7 +6,6 @@ const {
     GraphQLList
 } = require('graphql');
 
-const {TransactionType} = require('./TransactionSchema');
 const LongType = require('./LongType');
 
 const appRegistry = require('../appRegistry');
@@ -19,6 +18,8 @@ const TransactionModel = modelsFactory.getModel('Transaction');
 const ExpenseItemType = new GraphQLObjectType({
     name: 'ExpenseItem',
     fields() {
+        const {TransactionType} = require('./TransactionSchema');
+        
         return {
             id: { type: GraphQLID },
             name: { type: GraphQLString },

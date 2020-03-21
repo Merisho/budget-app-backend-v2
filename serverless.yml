@@ -19,5 +19,6 @@ functions:
       - http:
           path: /
           method: post
+          cors: true
     environment:
       NODE_ENV: ${self:custom.env.STAGE.${self:custom.stage}}

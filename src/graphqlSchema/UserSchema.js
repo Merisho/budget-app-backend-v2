@@ -14,11 +14,11 @@ const auth = appRegistry.get('auth');
 const UserModel = modelsFactory.getModel('User');
 const BudgetModel = modelsFactory.getModel('Budget');
 
-const {BudgetType} = require('./BudgetSchema');
-
 const UserType = new GraphQLObjectType({
     name: 'User',
     fields() {
+        const {BudgetType} = require('./BudgetSchema');
+        
         return {
             id: { type: GraphQLID },
             login: { type: GraphQLString },
