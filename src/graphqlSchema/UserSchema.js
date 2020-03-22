@@ -14,19 +14,24 @@ const auth = appRegistry.get('auth');
 const UserModel = modelsFactory.getModel('User');
 const BudgetModel = modelsFactory.getModel('Budget');
 
-const {BudgetType} = require('./BudgetSchema');
-
 const UserType = new GraphQLObjectType({
     name: 'User',
     fields() {
+        const {BudgetType} = require('./BudgetSchema');
+        
         return {
             id: { type: GraphQLID },
             login: { type: GraphQLString },
             email: { type: GraphQLString },
             budgets: {
                 type: new GraphQLList(BudgetType),
-                resolve(parent, args) {
-                    return BudgetModel.findByUserID(parent.id);
+                async resolve(parent, args) {
+                    const [own, shared] = await Promise.all([
+                        BudgetModel.findByUserID(parent.id),
+                        BudgetModel.findWhere({ collaborators: { contains: parent.id } })
+                    ]);
+
+                    return own.concat(shared);
                 }
             }
         };

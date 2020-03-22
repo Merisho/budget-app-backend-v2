@@ -101,6 +101,12 @@ module.exports = {
         if (type === 'object') {
             if (val instanceof Date) {
                 return { S: val.toISOString() };
+            } else if (val instanceof Array) {
+                if (typeof val[0] === 'number') {
+                    return { NS: val.map(n => n.toString()) };
+                }
+
+                return { SS: [ ...val ] };
             }
 
             return { S: JSON.stringify(val) };
@@ -120,11 +126,16 @@ module.exports = {
         const filterExp = [];
 
         Object.keys(filter).forEach(k => {
-            const attrValue = this._expAttrValueKey(k);
-            filterExp.push(`${k} = ${attrValue}`);
+            const attrValueAlias = this._expAttrValueKey(k);
+
+            if (filter[k].contains) {
+                filterExp.push(`contains(${k}, ${attrValueAlias})`);
+            } else {
+                filterExp.push(`${k} = ${attrValueAlias}`);
+            }
         });
 
-        return filterExp.join(', ');
+        return filterExp.join(' and ');
     },
 
     _expAttrNameKey(key) {

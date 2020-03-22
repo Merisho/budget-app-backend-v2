@@ -11,7 +11,7 @@ module.exports = {
                 this._email = data.email;
             }
         
-            static async save(data) {
+            static save(data) {
                 if (!data || !data.login || !data.id) {
                     throw new Error('Login must be defined');
                 }

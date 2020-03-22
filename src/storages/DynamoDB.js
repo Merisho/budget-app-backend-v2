@@ -88,11 +88,12 @@ module.exports = class DynamoDB {
     getByCondition(entityName, condition) {
         const table = this._resolveTable(entityName);
 
-        const attrVals = dynamoUtils.expressionAttributeValues(condition);
+        const attrVals = this._attributeValuesFromCondition(condition);
+        const exprAttrVals = dynamoUtils.expressionAttributeValues(attrVals);
         const filterExp = dynamoUtils.filterExpression(condition);
 
         return this._awsDynamo.scan({
-            ExpressionAttributeValues: attrVals,
+            ExpressionAttributeValues: exprAttrVals,
             FilterExpression: filterExp,
             TableName: table
         }).promise().then(data => data.Items.map(dynamoUtils.entity));
@@ -105,5 +106,19 @@ module.exports = class DynamoDB {
         }
 
         return tableName + this._tableSuffix;
+    }
+
+    _attributeValuesFromCondition(condition) {
+        const attrVals = {};
+        Object.keys(condition).forEach(k => {
+            const cond = condition[k];
+            if (cond.contains) {
+                attrVals[k] = cond.contains;
+            } else {
+                attrVals[k] = cond;
+            }
+        });
+
+        return attrVals;
     }
 };

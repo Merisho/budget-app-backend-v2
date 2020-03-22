@@ -6,19 +6,22 @@ const {
     GraphQLList
 } = require('graphql');
 
-const {ExpenseItemType} = require('./ExpenseItemSchema');
-const LongType = require('./LongType');
-
 const appRegistry = require('../appRegistry');
 
 const modelsFactory = appRegistry.get('models');
 
 const BudgetModel = modelsFactory.getModel('Budget');
 const ExpenseItemModel = modelsFactory.getModel('ExpenseItem');
+const UserModel = modelsFactory.getModel('User');
+
+const LongType = require('./LongType');
 
 const BudgetType = new GraphQLObjectType({
     name: 'Budget',
     fields() {
+        const {ExpenseItemType} = require('./ExpenseItemSchema');
+        const {UserType} = require('./UserSchema');
+        
         return {
             id: { type: GraphQLID },
             name: { type: GraphQLString },
@@ -59,6 +62,14 @@ const BudgetType = new GraphQLObjectType({
                 async resolve(parent, args) {
                     const budget = await BudgetModel.find(parent.id);
                     return budget.allowed();
+                }
+            },
+            collaborators: {
+                type: new GraphQLList(UserType),
+                async resolve(parent, args) {
+                    const budget = await BudgetModel.find(parent.id);
+                    const collaborators = await Promise.all(budget.collaborators.map(id => UserModel.find(id)));
+                    return collaborators;
                 }
             }
         };
@@ -134,11 +145,29 @@ const budgetMutations = {
         resolve(parent, args) {
             return BudgetModel.delete(args.id);
         }
+    },
+
+    shareBudget: {
+        type: BudgetType,
+        args: {
+            id: { type: new GraphQLNonNull(GraphQLID) },
+            email: { type: new GraphQLNonNull(GraphQLString) }
+        },
+        async resolve(parent, args) {
+            const [budget, users] = await Promise.all([BudgetModel.find(args.id), UserModel.findWhere({ email: args.email })]);
+            if (!budget || !users) {
+                return null;
+            }
+
+            const [user] = users;
+
+            return budget.shareWith(user.id);
+        }
     }
 };
 
 module.exports = {
     BudgetType,
     budgetMutations,
-    budgetQueries
+    budgetQueries,
 };

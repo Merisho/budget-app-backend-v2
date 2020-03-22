@@ -1,8 +1,8 @@
 const AWS = require('aws-sdk');
 
 module.exports = class Cognito {
-    constructor() {
-        this._cognito = new AWS.CognitoIdentityServiceProvider();
+    constructor(params = {}) {
+        this._cognito = new AWS.CognitoIdentityServiceProvider(params);
     }
 
     async getUser(accessToken) {

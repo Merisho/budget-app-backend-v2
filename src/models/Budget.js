@@ -18,6 +18,7 @@ module.exports = {
                 this._startDate = data.startDate;
                 this._endDate = data.endDate;
                 this._userID = data.userID;
+                this._collaborators = data.collaborators || [];
             }
 
             static async findByUserID(userID) {
@@ -37,7 +38,7 @@ module.exports = {
             }
 
             toJSON() {
-                return {
+                const json = {
                     id: this.id,
                     name: this.name,
                     total: this.total,
@@ -45,8 +46,14 @@ module.exports = {
                     creationDate: this.creationDate,
                     startDate: this.startDate,
                     endDate: this.endDate,
-                    userID: this.userID
+                    userID: this.userID,
                 };
+
+                if (this.collaborators.length > 0) {
+                    json.collaborators = this.collaborators;
+                }
+
+                return json;
             }
 
             async free() {
@@ -86,6 +93,18 @@ module.exports = {
                 return transactions;
             }
 
+            async shareWith(userID) {
+                if (!userID || this.userID === userID || this.collaborators.includes(userID)) {
+                    return this;
+                }
+
+                await this.sync();
+                this._collaborators.push(userID);
+                await this.update();
+
+                return this;
+            }
+
             get id() {
                 return this._id;
             }
@@ -116,6 +135,10 @@ module.exports = {
 
             get userID() {
                 return this._userID;
+            }
+
+            get collaborators() {
+                return this._collaborators;
             }
 
             set name(val) {

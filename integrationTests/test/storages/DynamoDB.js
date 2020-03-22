@@ -28,9 +28,9 @@ const customDynamo = new DynamoDBStorage({
     tables: config.tables
 });
 
-test.after(async () => {
-    await dynamoHelper.truncateTable(testTable);
-});
+test.before(() => dynamoHelper.truncateTable(testTable));
+
+test.after(() => dynamoHelper.truncateTable(testTable));
 
 test('Must get item by ID', async t => {
     const id = uuid();
@@ -71,18 +71,43 @@ test('Must update a item by ID', async t => {
     t.is(data.Items[0].testValue.S, 'updated');
 });
 
-test('Must get items by condition', async t => {
-    const id1 = uuid();
-    const id2 = uuid();
+test('Must get items by simple condition', async t => {
     const uniqVal = uuid();
     await Promise.all([
-        dynamoHelper.putItem(testTable, { id: id1, testValue: uniqVal }),
-        dynamoHelper.putItem(testTable, { id: id2, testValue: uniqVal })
+        dynamoHelper.putItem(testTable, { id: uuid(), testValue: uniqVal }),
+        dynamoHelper.putItem(testTable, { id: uuid(), testValue: uniqVal })
     ]);
 
     const items = await customDynamo.getByCondition(testEntity, { testValue: uniqVal });
 
     t.is(items.length, 2);
+});
+
+test('Must get items by "contains" condition', async t => {
+    const neededId = uuid();
+    await Promise.all([
+        dynamoHelper.putItem(testTable, { id: uuid(), testCollection: [ 1, 2, 3, 4 ] }),
+        dynamoHelper.putItem(testTable, { id: neededId, testCollection: [ 5, 6, 7 ] }),
+    ]);
+
+    const items = await customDynamo.getByCondition(testEntity, { testCollection: { contains: 6 } });
+
+    t.is(items.length, 1);
+    t.is(items[0].id, neededId);
+});
+
+test('Must get items by simple and "contains" conditions combined', async t => {
+    const neededId = uuid();
+    await Promise.all([
+        dynamoHelper.putItem(testTable, { id: neededId, coll: [1, 2], attr: 'A' }),
+        dynamoHelper.putItem(testTable, { id: uuid(), coll: [2, 3], attr: 'B' }),
+        dynamoHelper.putItem(testTable, { id: uuid(), coll: [3, 4], attr: 'A' })
+    ]);
+
+    const items = await customDynamo.getByCondition(testEntity, { attr: 'A', coll: { contains: 2 } });
+
+    t.is(items.length, 1);
+    t.is(items[0].id, neededId);
 });
 
 test('Must delete items by condition and return deleted IDs', async t => {

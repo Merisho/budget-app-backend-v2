@@ -20,7 +20,7 @@ test('Must build expression attribute values from data object', t => {
     const data = {
         a: '1',
         b: 2,
-        c: true
+        c: true,
     };
 
     const expAttrValues = dynamoUtils.expressionAttributeValues(data);
@@ -49,6 +49,8 @@ test('Must return DynamoDB typed attribute value', t => {
     const date = new Date(0);
     const obj = { test: 'test' };
     const undef = undefined;
+    const strArr = [ 'test', 'str' ];
+    const numArr = [ 1, 2, 3 ];
 
     const strAttr = dynamoUtils.dynamoValue(str);
     const numAttr = dynamoUtils.dynamoValue(num);
@@ -56,6 +58,8 @@ test('Must return DynamoDB typed attribute value', t => {
     const dateAttr = dynamoUtils.dynamoValue(date);
     const objAttr = dynamoUtils.dynamoValue(obj);
     const undefAttr = dynamoUtils.dynamoValue(undef);
+    const strArrAttr = dynamoUtils.dynamoValue(strArr);
+    const numArrAttr = dynamoUtils.dynamoValue(numArr);
 
     t.is(strAttr.S, str);
     t.is(numAttr.N, num.toString());
@@ -63,17 +67,22 @@ test('Must return DynamoDB typed attribute value', t => {
     t.is(dateAttr.S, date.toISOString());
     t.is(objAttr.S, JSON.stringify(obj));
     t.is(undefAttr, undefined);
+    t.deepEqual(strArrAttr.SS, strArr);
+    t.deepEqual(numArrAttr.NS, numArr.map(n => n.toString()));
 });
 
 test('Must build FilterExpression', t => {
     const filter = {
         attr1: 'val1',
-        attr2: 'val2'
+        attr2: 'val2',
+        attr3: {
+            contains: 'val3',
+        },
     };
 
     const filterExpression = dynamoUtils.filterExpression(filter);
 
-    t.is(filterExpression, 'attr1 = :attr1, attr2 = :attr2');
+    t.is(filterExpression, 'attr1 = :attr1 and attr2 = :attr2 and contains(attr3, :attr3)');
 });
 
 test('Must build DeleteRequest for BatchWriteItem', t => {
