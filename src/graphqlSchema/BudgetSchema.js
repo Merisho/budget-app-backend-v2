@@ -30,6 +30,7 @@ const BudgetType = new GraphQLObjectType({
             creationDate: { type: GraphQLString },
             startDate: { type: GraphQLString },
             endDate: { type: GraphQLString },
+            userID: { type: GraphQLID },
             expenseItems: {
                 type: new GraphQLList(ExpenseItemType),
                 resolve(parent, args) {
@@ -70,6 +71,12 @@ const BudgetType = new GraphQLObjectType({
                     const budget = await BudgetModel.find(parent.id);
                     const collaborators = await Promise.all(budget.collaborators.map(id => UserModel.find(id)));
                     return collaborators;
+                }
+            },
+            owner: {
+                type: UserType,
+                resolve(parent, args) {
+                    return UserModel.find(parent.userID);
                 }
             }
         };
