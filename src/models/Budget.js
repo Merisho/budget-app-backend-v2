@@ -93,7 +93,7 @@ module.exports = {
                 return transactions;
             }
 
-            async shareWith(userID) {
+            async addCollaborator(userID) {
                 if (!userID || this.userID === userID || this.collaborators.includes(userID)) {
                     return this;
                 }

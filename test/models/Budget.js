@@ -156,7 +156,7 @@ test('Must add a collaborator', async t => {
     budget.sync = () => Promise.resolve();
     budget.update = () => Promise.resolve();
 
-    await budget.shareWith('test');
+    await budget.addCollaborator('test');
 
     t.deepEqual(budget.collaborators, [ 'test' ]);
 });
@@ -169,7 +169,7 @@ test('Must not add a collaborator if he/she is a budget owner', async t => {
     budget.sync = () => Promise.resolve();
     budget.update = () => Promise.resolve();
 
-    await budget.shareWith('test');
+    await budget.addCollaborator('test');
 
     t.is(budget.collaborators.length, 0);
 });
@@ -182,8 +182,8 @@ test('Must not add same collaborator multiple times', async t => {
     budget.sync = () => Promise.resolve();
     budget.update = () => Promise.resolve();
 
-    await budget.shareWith('test');
-    await budget.shareWith('test');
+    await budget.addCollaborator('test');
+    await budget.addCollaborator('test');
 
     t.is(budget.collaborators.length, 1);
 });

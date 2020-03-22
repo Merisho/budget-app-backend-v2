@@ -154,7 +154,7 @@ const budgetMutations = {
         }
     },
 
-    shareBudget: {
+    addCollaborator: {
         type: BudgetType,
         args: {
             id: { type: new GraphQLNonNull(GraphQLID) },
@@ -168,7 +168,7 @@ const budgetMutations = {
 
             const [user] = users;
 
-            return budget.shareWith(user.id);
+            return budget.addCollaborator(user.id);
         }
     }
 };
