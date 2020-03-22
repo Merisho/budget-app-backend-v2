@@ -151,15 +151,17 @@ const budgetMutations = {
         type: BudgetType,
         args: {
             id: { type: new GraphQLNonNull(GraphQLID) },
-            userID: { type: new GraphQLNonNull(GraphQLID) }
+            email: { type: new GraphQLNonNull(GraphQLString) }
         },
         async resolve(parent, args) {
-            const budget = await BudgetModel.find(args.id);
-            if (!budget) {
+            const [budget, users] = await Promise.all([BudgetModel.find(args.id), UserModel.findWhere({ email: args.email })]);
+            if (!budget || !users) {
                 return null;
             }
 
-            return budget.shareWith(args.userID);
+            const [user] = users;
+
+            return budget.shareWith(user.id);
         }
     }
 };

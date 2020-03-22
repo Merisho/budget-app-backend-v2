@@ -94,7 +94,7 @@ module.exports = {
             }
 
             async shareWith(userID) {
-                if (this.userID === userID || this.collaborators.includes(userID)) {
+                if (!userID || this.userID === userID || this.collaborators.includes(userID)) {
                     return this;
                 }
 
