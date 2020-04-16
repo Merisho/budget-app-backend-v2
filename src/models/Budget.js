@@ -21,7 +21,7 @@ module.exports = {
                 this._collaborators = data.collaborators || [];
             }
 
-            static async findByUserID(userID) {
+            static findByUserID(userID) {
                 return super.findWhere({userID});
             }
 

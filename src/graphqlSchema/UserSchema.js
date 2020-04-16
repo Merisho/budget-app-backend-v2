@@ -31,6 +31,14 @@ const UserType = new GraphQLObjectType({
                         BudgetModel.findWhere({ collaborators: { contains: parent.id } })
                     ]);
 
+                    if (!own) {
+                        return shared;
+                    }
+
+                    if (!shared) {
+                        return own;
+                    }
+                    
                     return own.concat(shared);
                 }
             }
