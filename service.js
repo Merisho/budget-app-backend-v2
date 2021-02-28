@@ -34,6 +34,9 @@ module.exports.api = async (event, context) => {
         console.error(err);
         return {
             statusCode: 500,
+            headers: {
+                'Access-Control-Allow-Origin' : '*'
+            },
             body: 'Internal error',
         };
     }
